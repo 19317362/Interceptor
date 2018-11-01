@@ -1,4 +1,4 @@
-#include "CallGraphTimeline.h"
+﻿#include "CallGraphTimeline.h"
 #include "Interceptor_Internal.h"
 #include "InterceptorUtils.h"
 #include "Logger.h"
@@ -35,7 +35,7 @@ string_id TimelineNode::get_description()const {
 }
 
 void TimelineNode::create_location(int _cemter_x, int _y) {
-	
+
 	m_location.x = _cemter_x;
 	m_location.y = _y;
 }
@@ -51,7 +51,7 @@ int TimelineNode::x()const {
 	return m_location.x;
 }
 
-int TimelineNode::y()const { 
+int TimelineNode::y()const {
 	if (m_location.y < 0) {
 		throw std::runtime_error("TimelineNode location has not been calculated");
 	}
@@ -60,7 +60,7 @@ int TimelineNode::y()const {
 
 int TimelineNode::width()const {
 	if (m_width < 0) {
-		m_width = (Interceptor_Internal::get().get_string_from_id(m_description).size() + 1)*NODE_CHAR_WIDTH;
+		m_width = static_cast<int>((Interceptor_Internal::get().get_string_from_id(m_description).size() + 1)*NODE_CHAR_WIDTH);
 		m_width = (std::max)(NODE_MIN_WIDTH, m_width);
 	}
 	return m_width;
@@ -103,7 +103,7 @@ bool TimelineNode::get_connection_svg(const std::map<std::size_t, string_id > &_
 	std::string node_y_start = Utils::get_string(y() - (NODE_BOX_HEIGHT / 2));
 	std::string node_y_end = Utils::get_string(y() + (NODE_BOX_HEIGHT / 2));
 	for (auto &connection : m_call_to) {
-		
+
 		std::string connection_str_arc = _svg_name + R"(.append('path').attr('d','M $STARTX$ $STARTY$ A$RX$,$RY$ 0 $LONGSIDE$,$MIRROR$ $ENDX$ $ENDY$').attr('stroke','$COLOR$').attr('stroke-width','1').attr('fill','none'))";
 		std::string connection_str_beizer = _svg_name + R"(.append('path').attr('d','M $STARTX$, $STARTY$ Q$CONTROLX$, $CONTROLY$ $ENDX$, $ENDY$').attr('stroke','$COLOR$').attr('stroke-width','1').attr('fill','none'))";
 		std::string connection_str;
@@ -124,15 +124,15 @@ bool TimelineNode::get_connection_svg(const std::map<std::size_t, string_id > &_
 				std::string color_str = "";
 				std::string node_y = "";
 				std::string conn_node_x = Utils::get_string(conn_node.x());
-				
+
 				std::string start_x = "";
 				std::string end_x = "";
-			
+
 				if (conn_id == m_id) {
 					connection_str = connection_str_arc;
 					std::string mirror = "";
 					int dx = std::abs((conn_node.x() - x()) / 2);
-					int dy = std::sqrt(dx) + 1;
+					int dy = static_cast<int>( std::sqrt(dx) + 1);
 					std::string dx_str = Utils::get_string(dx);
 					std::string dy_str = Utils::get_string(dy);
 					start_x = node_x; ;
@@ -180,7 +180,7 @@ bool TimelineNode::get_connection_svg(const std::map<std::size_t, string_id > &_
 					Utils::replace_all(connection_str, "$CONTROLY$", control_y);
 					Utils::replace_all(connection_str, "$COLOR$", color_str);
 				}
-								
+
 				(*_ofs) << connection_str << "\n";
 			}
 		}
@@ -254,10 +254,10 @@ container$SVGID$.style('height',"500").style('width','100%').style('border','2px
 	Utils::replace_all(timeline_container, "$SVGID$", timeline_id_str);
 	Utils::replace_all(timeline_svg, "$SVGID$", timeline_id_str);
 	Utils::replace_all(timeline_svg, "$WIDTH$", Utils::get_string(max_x));
-	
-	
+
+
 	std::string svg_name = "sky" + timeline_id_str;
-	
+
 	std::ostringstream str;
 	for (auto &n : m_node_id_to_node_desc) {
 		auto iter = m_nodes.find(n.second);
@@ -266,7 +266,7 @@ container$SVGID$.style('height',"500").style('width','100%').style('border','2px
 			returnVal = false;
 		}
 	}
-	
+
 	for (auto &n : m_node_id_to_node_desc) {
 		auto iter = m_nodes.find(n.second);
 		if (!(*iter).second.get_connection_svg(m_node_id_to_node_desc,m_nodes, svg_name, &str)) {
